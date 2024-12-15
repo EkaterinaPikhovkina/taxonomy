@@ -45,6 +45,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
+import com.chaquo.python.PyObject
+import com.chaquo.python.Python
+
 class MainActivity : ComponentActivity() {
     val launcher = registerForActivityResult(ActivityResultContracts.OpenDocument()){
 
@@ -79,6 +82,11 @@ fun DocumentCorpus(
     ) {
         val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
+        val python = Python.getInstance()
+        val pythonModule = python.getModule("test")
+        val result : PyObject = pythonModule.callAttr("fun")
+        val message : String = result.toString()
+
         Scaffold(
             modifier = Modifier
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -90,7 +98,7 @@ fun DocumentCorpus(
                     ),
                     title = {
                         Text(
-                            "Document Corpus",
+                            "Document Corpus $message",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

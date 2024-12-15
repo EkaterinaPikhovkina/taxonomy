@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.chaquo.python")
 }
 
 android {
@@ -18,6 +19,16 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
+
+//        python {
+//            pip {
+////            install("scipy")
+//            }
+//        }
     }
 
     buildTypes {
@@ -67,4 +78,18 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+chaquopy {
+    defaultConfig {
+        buildPython("C:/Users/user/AppData/Local/Programs/Python/Python38/python.exe")
+
+        pyc {
+            src = true
+        }
+
+        pip {
+//            install("scipy")
+        }
+    }
 }
