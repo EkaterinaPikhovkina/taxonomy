@@ -2,5 +2,8 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
-    id("com.chaquo.python") version "16.0.0" apply false
+    alias(libs.plugins.chaquo) apply false
+    alias(libs.plugins.gms) apply false
+    alias(libs.plugins.compose.compiler) apply true
+    alias(libs.plugins.plugin.serialization) apply true
 }

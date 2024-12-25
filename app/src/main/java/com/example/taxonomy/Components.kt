@@ -1,6 +1,7 @@
 package com.example.taxonomy
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,9 +26,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
+import com.example.taxonomy.ui.login.data.LoginScreenObject
 
 @Composable
 fun TopAppBar(
@@ -37,30 +40,47 @@ fun TopAppBar(
     titleText: String,
     backgroundColor: Color = MaterialTheme.colorScheme.primary,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary,
-) {
+    navController: NavHostController
+    ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(start = 30.dp, top = 30.dp, end = 30.dp, bottom = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(start = 30.dp, top = 30.dp, end = 30.dp, bottom = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
+        Row {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(iconResId)
+                    .decoderFactory(SvgDecoder.Factory())
+                    .build(),
+                contentDescription = null,
+                modifier = Modifier.size(iconSize),
+                contentScale = ContentScale.Fit
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = titleText,
+                color = contentColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.headlineLarge
+            )
+        }
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(iconResId)
+                .data(R.drawable.sign_out)
                 .decoderFactory(SvgDecoder.Factory())
                 .build(),
-            contentDescription = null,
-            modifier = Modifier.size(iconSize),
+            contentDescription = "Sign Out",
+            modifier = Modifier
+                .size(20.dp)
+                .clickable {
+                    navController.navigate(LoginScreenObject)
+                },
             contentScale = ContentScale.Fit
-        )
-        Spacer(modifier = Modifier.width(10.dp))
-        Text(
-            text = titleText,
-            color = contentColor,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.headlineLarge
         )
     }
 }
@@ -125,7 +145,6 @@ fun WordListCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-//            .padding(24.dp)
             .clip(RoundedCornerShape(24.dp))
             .background(backgroundColor)
             .padding(24.dp)
@@ -160,3 +179,13 @@ fun WordListCard(
         }
     }
 }
+
+//@Preview
+//@Composable
+//fun PreviewNERTagging() {
+//    TaxonomyTheme {
+//        Surface {
+//            NERTagging()
+//        }
+//    }
+//}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "3991941343",
+    "project_id": "taxonomy-generator",
+    "storage_bucket": "taxonomy-generator.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:3991941343:android:a0778af2c1e7a3747df96a",
+        "android_client_info": {
+          "package_name": "com.example.taxonomy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_DR4uCRVQWuR02MPUag6tnbFOnE5yM6k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

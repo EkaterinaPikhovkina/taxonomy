@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
+import androidx.navigation.NavHostController
 import java.io.File
 import java.io.FileOutputStream
 
@@ -21,6 +22,7 @@ import java.io.FileOutputStream
 fun NERTagging(
     categories: List<String>,
     keywords: List<List<String>>,
+    navController: NavHostController,
     navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -68,7 +70,8 @@ fun NERTagging(
 
         TopAppBar(
             iconResId = R.drawable.tag,
-            titleText = "NER Tagging"
+            titleText = "NER Tagging",
+            navController = navController
         )
 
         LazyColumn(
@@ -108,14 +111,3 @@ fun NERTagging(
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun PreviewNERTagging() {
-//    TaxonomyTheme {
-//        Surface {
-//            NERTagging()
-//        }
-//    }
-//}
-

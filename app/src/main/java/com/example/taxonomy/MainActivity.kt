@@ -10,12 +10,16 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import com.example.taxonomy.ui.login.LoginScreen
+import com.example.taxonomy.ui.login.data.DocumentCorpusObject
+import com.example.taxonomy.ui.login.data.LoginScreenObject
 import com.example.taxonomy.ui.theme.TaxonomyTheme
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             TaxonomyTheme {
                 val navController = rememberNavController()
@@ -24,10 +28,22 @@ class MainActivity : ComponentActivity() {
                     Python.start(AndroidPlatform(this))
                 }
 
-                NavHost(navController = navController, startDestination = "document_corpus") {
-                    composable("document_corpus") {
-                        DocumentCorpus (navController = navController)
+                NavHost(
+                    navController = navController,
+                    startDestination = LoginScreenObject) {
+
+                    composable<LoginScreenObject> {
+                        LoginScreen { navData ->
+                            navController.navigate(navData)
+                        }
                     }
+
+                    composable<DocumentCorpusObject> {
+                        DocumentCorpus (
+                            navController = navController
+                        )
+                    }
+
                     composable(
                         "ner_tagging/{categories}/{keywords}",
                         arguments = listOf(
@@ -43,7 +59,11 @@ class MainActivity : ComponentActivity() {
                             it.split(",").filter { it.isNotBlank() }
                         }
 
-                        NERTagging(categories = categories, keywords = keywords) {
+                        NERTagging(
+                            categories = categories,
+                            keywords = keywords,
+                            navController = navController
+                        ) {
                             navController.popBackStack()
                         }
                     }

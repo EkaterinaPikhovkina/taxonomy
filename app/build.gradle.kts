@@ -1,7 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.chaquo.python")
+    alias(libs.plugins.chaquo)
+    alias(libs.plugins.gms)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.plugin.serialization)
 }
 
 android {
@@ -56,6 +59,11 @@ android {
 }
 
 dependencies {
+
+    implementation(platform(libs.google.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.coil)
     implementation(libs.coil.kt.coil.compose)

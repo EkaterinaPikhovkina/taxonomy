@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -18,17 +20,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.chaquo.python.PyObject
-import com.chaquo.python.Python
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
+import com.chaquo.python.PyObject
+import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -44,7 +44,8 @@ fun DocumentCorpus(
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
             iconResId = R.drawable.doc,
-            titleText = "Document Corpus"
+            titleText = "Document Corpus",
+            navController = navController
         )
 
         fun processAllFiles(uris: List<Uri>) {
