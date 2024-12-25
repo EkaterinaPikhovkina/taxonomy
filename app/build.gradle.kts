@@ -24,11 +24,6 @@ android {
             abiFilters += listOf("arm64-v8a", "x86_64")
         }
 
-//        python {
-//            pip {
-////            install("scipy")
-//            }
-//        }
     }
 
     buildTypes {
@@ -62,6 +57,10 @@ android {
 
 dependencies {
 
+    implementation(libs.coil)
+    implementation(libs.coil.kt.coil.compose)
+    implementation(libs.coil.svg)
+    implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -71,6 +70,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui.test.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -89,7 +89,25 @@ chaquopy {
         }
 
         pip {
-//            install("scipy")
+            install("numpy")
+
+            install("spacy")
+//            install("requests==3.7.5")
+
+//            install("sparknlp")
+//            install("pyspark")
+//            install("pandas")
+
+//            // An sdist or wheel filename, relative to the project directory:
+//            install("en_core_web_sm-3.7.1-py3-none-any.whl")
+//
+//            // A directory containing a setup.py, relative to the project
+//            // directory (must contain at least one slash):
+            install("./en_core_web_sm-2.2.5")
+//
+//            // "-r"` followed by a requirements filename, relative to the
+//            // project directory:
+//            install("-r", "requirements.txt")
         }
     }
 }
