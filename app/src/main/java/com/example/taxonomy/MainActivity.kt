@@ -3,16 +3,18 @@ package com.example.taxonomy
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.navOptions
+import androidx.navigation.toRoute
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
-import com.example.taxonomy.ui.login.LoginScreen
-import com.example.taxonomy.ui.login.data.DocumentCorpusObject
-import com.example.taxonomy.ui.login.data.LoginScreenObject
+import com.example.taxonomy.ui.data.DocumentCorpusObject
+import com.example.taxonomy.ui.data.LoginScreenObject
+import com.example.taxonomy.ui.data.ProfileObject
+import com.example.taxonomy.ui.data.ProjectsObject
+import com.example.taxonomy.ui.data.TaxonomyObject
 import com.example.taxonomy.ui.theme.TaxonomyTheme
 
 class MainActivity : ComponentActivity() {
@@ -30,45 +32,55 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = LoginScreenObject) {
+                    startDestination = LoginScreenObject
+                ) {
 
                     composable<LoginScreenObject> {
                         LoginScreen { navData ->
-                            navController.navigate(navData)
+                            navController.navigate(navData,
+                                navOptions {
+                                    popUpTo<LoginScreenObject> {
+                                        inclusive = true
+                                    }
+                                }
+                            )
                         }
                     }
 
-                    composable<DocumentCorpusObject> {
-                        DocumentCorpus (
-                            navController = navController
+                    composable<ProfileObject> { navEntry ->
+                        Profile(
+                            navController = navController,
+                            navEntry.toRoute<ProfileObject>()
                         )
                     }
 
-                    composable(
-                        "ner_tagging/{categories}/{keywords}",
-                        arguments = listOf(
-                            navArgument("categories") { type = NavType.StringType },
-                            navArgument("keywords") { type = NavType.StringType }
+                    composable<DocumentCorpusObject> { navEntry ->
+                        DocumentCorpus(
+                            navController = navController,
+                            navEntry.toRoute<DocumentCorpusObject>()
                         )
-                    ) { backStackEntry ->
-                        val categoriesString = backStackEntry.arguments?.getString("categories") ?: ""
-                        val keywordsString = backStackEntry.arguments?.getString("keywords") ?: ""
+                    }
 
-                        val categories = categoriesString.split(",").filter { it.isNotBlank() }
-                        val keywords = keywordsString.split("|").map { it ->
-                            it.split(",").filter { it.isNotBlank() }
-                        }
+                    composable<TaxonomyObject> { navEntry ->
+                        Taxonomy(
+                            navController = navController,
+                            navigateBack = {
+                                navController.popBackStack()
+                            },
+                            navEntry.toRoute<TaxonomyObject>(),
+                        )
+                    }
 
-                        NERTagging(
-                            categories = categories,
-                            keywords = keywords,
-                            navController = navController
-                        ) {
-                            navController.popBackStack()
-                        }
+                    composable<ProjectsObject> { navEntry ->
+                        val receivedData = navEntry.toRoute<ProjectsObject>()
+                        Projects(
+                            navController = navController,
+                            receivedData
+                        )
                     }
                 }
             }
         }
     }
 }
+

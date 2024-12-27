@@ -30,12 +30,16 @@ import coil.request.ImageRequest
 import com.chaquo.python.PyObject
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import com.example.taxonomy.ui.data.DocumentCorpusObject
+import com.example.taxonomy.ui.data.ProfileObject
+import com.example.taxonomy.ui.data.TaxonomyObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
 @Composable
 fun DocumentCorpus(
     navController: NavHostController,
+    navData: DocumentCorpusObject
 ) {
     val loadedFiles = remember { mutableStateOf<List<String>>(emptyList()) }
     val textContent = remember { mutableStateOf("") }
@@ -45,7 +49,9 @@ fun DocumentCorpus(
         TopAppBar(
             iconResId = R.drawable.doc,
             titleText = "Document Corpus",
-            navController = navController
+            navController = navController,
+            profileIcon = 1,
+            navData = ProfileObject(navData.uid, navData.email)
         )
 
         fun processAllFiles(uris: List<Uri>) {
@@ -81,22 +87,28 @@ fun DocumentCorpus(
             verticalArrangement = Arrangement.spacedBy(28.dp)
         ) {
             item {
-                OutlinedButton(
-                    onClick = {
-                        launcher.launch(
-                            arrayOf(
-                                "text/plain",
-                                "application/pdf",
-                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                            )
-                        )
-                    },
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "Load data",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSecondary
-                    )
+                    OutlinedButton(
+                        onClick = {
+                            launcher.launch(
+                                arrayOf(
+                                    "text/plain",
+                                    "application/pdf",
+                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                )
+                            )
+                        },
+                    ) {
+                        Text(
+                            text = "Load Data",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSecondary
+                        )
+                    }
                 }
             }
 
@@ -160,7 +172,12 @@ fun DocumentCorpus(
                         val categoriesString = categories.joinToString(",")
                         val keywordsString = keywords.joinToString("|") { it.joinToString(",") }
 
-                        navController.navigate("ner_tagging/$categoriesString/$keywordsString")
+                        navController.navigate(TaxonomyObject(
+                            uid = navData.uid,
+                            email = navData.email,
+                            categories = categoriesString,
+                            keywords = keywordsString
+                        ))
                     }
                 },
                 text = "Next",

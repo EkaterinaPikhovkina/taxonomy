@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -30,17 +33,58 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
-import com.example.taxonomy.ui.login.data.LoginScreenObject
+import com.example.taxonomy.ui.data.ProfileObject
+
+@Composable
+fun AuthTextField(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    label: @Composable () -> Unit
+) {
+    TextField(
+        modifier = modifier.fillMaxWidth(),
+        value = value,
+        onValueChange = onValueChange,
+        textStyle = textStyle,
+        label = label,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.secondary,
+            unfocusedContainerColor = MaterialTheme.colorScheme.secondary,
+            disabledContainerColor = MaterialTheme.colorScheme.secondary,
+        )
+    )
+}
+
+@Composable
+fun ButtonWithoutIcon(onClick: () -> Unit, text: String) {
+    Button(onClick = onClick) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
+    }
+}
 
 @Composable
 fun TopAppBar(
     modifier: Modifier = Modifier,
-    iconResId: Int,
+    iconResId: Int?,
     iconSize: Dp = 20.dp,
     titleText: String,
+    profileIcon: Int?,
     backgroundColor: Color = MaterialTheme.colorScheme.primary,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary,
-    navController: NavHostController
+    navController: NavHostController?,
+    navData: ProfileObject?
     ) {
     Row(
         modifier = modifier
@@ -69,19 +113,23 @@ fun TopAppBar(
                 style = MaterialTheme.typography.headlineLarge
             )
         }
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(R.drawable.sign_out)
-                .decoderFactory(SvgDecoder.Factory())
-                .build(),
-            contentDescription = "Sign Out",
-            modifier = Modifier
-                .size(20.dp)
-                .clickable {
-                    navController.navigate(LoginScreenObject)
-                },
-            contentScale = ContentScale.Fit
-        )
+        if (profileIcon != null) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(R.drawable.profile)
+                    .decoderFactory(SvgDecoder.Factory())
+                    .build(),
+                contentDescription = "Sign Out",
+                modifier = Modifier
+                    .size(20.dp)
+                    .clickable {
+                        if (navData != null) {
+                            navController?.navigate(ProfileObject(navData.uid, navData.email))
+                        }
+                    },
+                contentScale = ContentScale.Fit
+            )
+        }
     }
 }
 
@@ -177,6 +225,45 @@ fun WordListCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ProjectCard(
+    title: String,
+    backgroundColor: Color = MaterialTheme.colorScheme.secondary,
+    contentColor: Color = MaterialTheme.colorScheme.onSecondary,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(backgroundColor)
+            .clickable(onClick = onClick)
+            .padding(24.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = title,
+            color = contentColor,
+            style = MaterialTheme.typography.headlineMedium
+                .copy(fontFeatureSettings = "c2sc, smcp"),
+            textAlign = TextAlign.Start,
+        )
+//        AsyncImage(
+//            model = ImageRequest.Builder(LocalContext.current)
+//                .data(R.drawable.trash)
+//                .decoderFactory(SvgDecoder.Factory())
+//                .build(),
+//            contentDescription = "Delete",
+//            modifier = Modifier
+//                .size(20.dp)
+//                .clickable {
+//
+//                },
+//            contentScale = ContentScale.Fit
+//        )
     }
 }
 
