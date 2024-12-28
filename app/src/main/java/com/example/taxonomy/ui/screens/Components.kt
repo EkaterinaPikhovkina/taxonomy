@@ -1,4 +1,4 @@
-package com.example.taxonomy
+package com.example.taxonomy.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,6 +33,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
+import com.example.taxonomy.R
 import com.example.taxonomy.ui.data.ProfileObject
 
 @Composable
@@ -133,33 +134,13 @@ fun TopAppBar(
     }
 }
 
-//@Composable
-//fun ButtonWithIconLeft(onClick: () -> Unit, text: String, icon: Int, contentDescription: String? = null) {
-//    Button(onClick = onClick) {
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.Center
-//        ) {
-//            AsyncImage(
-//                model = ImageRequest.Builder(LocalContext.current)
-//                    .data(icon)
-//                    .decoderFactory(SvgDecoder.Factory())
-//                    .build(),
-//                contentDescription = contentDescription,
-//                modifier = Modifier.size(16.dp),
-//                contentScale = ContentScale.Fit
-//            )
-//            Spacer(modifier = Modifier.width(8.dp))
-//            Text(
-//                text = text,
-//                style = MaterialTheme.typography.labelMedium,
-//            )
-//        }
-//    }
-//}
-
 @Composable
-fun ButtonWithIconRight(onClick: () -> Unit, text: String, icon: Int, contentDescription: String? = null) {
+fun ButtonWithIconRight(
+    onClick: () -> Unit,
+    text: String,
+    icon: Int,
+    contentDescription: String? = null
+) {
     Button(onClick = onClick) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -168,7 +149,7 @@ fun ButtonWithIconRight(onClick: () -> Unit, text: String, icon: Int, contentDes
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelMedium,
-                )
+            )
             Spacer(modifier = Modifier.width(8.dp))
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -187,6 +168,7 @@ fun ButtonWithIconRight(onClick: () -> Unit, text: String, icon: Int, contentDes
 fun WordListCard(
     title: String,
     words: List<String>,
+    onClick: () -> Unit,
     backgroundColor: Color = MaterialTheme.colorScheme.secondary,
     contentColor: Color = MaterialTheme.colorScheme.onSecondary,
 ) {
@@ -196,6 +178,7 @@ fun WordListCard(
             .clip(RoundedCornerShape(24.dp))
             .background(backgroundColor)
             .padding(24.dp)
+            .clickable { onClick() },
     ) {
         Text(
             text = title,

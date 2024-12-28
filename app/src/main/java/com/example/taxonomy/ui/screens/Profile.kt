@@ -1,4 +1,4 @@
-package com.example.taxonomy
+package com.example.taxonomy.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +29,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
+import com.example.taxonomy.R
 import com.example.taxonomy.ui.data.DocumentCorpusObject
 import com.example.taxonomy.ui.data.LoginScreenObject
 import com.example.taxonomy.ui.data.ProfileObject

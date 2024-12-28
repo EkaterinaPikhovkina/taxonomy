@@ -1,4 +1,4 @@
-package com.example.taxonomy
+package com.example.taxonomy.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.taxonomy.R
 import com.example.taxonomy.ui.data.ProfileObject
 import com.example.taxonomy.ui.data.ProjectData
 import com.example.taxonomy.ui.data.ProjectsObject
@@ -56,42 +57,50 @@ fun Projects(
                 .padding(start = 30.dp, top = 30.dp, end = 30.dp, bottom = 0.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            if (projectsList.value.isEmpty()) {
+                item {
+                    Text(
+                        text = "You don't have any projects yet.",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            } else {
+                items(projectsList.value) { project ->
 
-            items(projectsList.value) { project ->
-
-                ProjectCard(
-                    title = project.name,
-                    onClick = {
-                        navController.navigate(
-                            TaxonomyObject(
-                                uid = navData.uid,
-                                name = project.name,
-                                categories = project.categories.joinToString(","),
-                                keywords = project.keywords.entries.joinToString("|") { (category, keywords) ->
-                                    "$category," + keywords.joinToString(",")
-                                }
+                    ProjectCard(
+                        title = project.name,
+                        onClick = {
+                            navController.navigate(
+                                TaxonomyObject(
+                                    uid = navData.uid,
+                                    name = project.name,
+                                    categories = project.categories.joinToString(","),
+                                    keywords = project.keywords.entries.joinToString("|") { (category, keywords) ->
+                                        "$category," + keywords.joinToString(",")
+                                    }
+                                )
                             )
-                        )
-                    },
-                    onDelete = { projectName ->
-                        deleteProject(
-                            db = FirebaseFirestore.getInstance(),
-                            uid = navData.uid,
-                            projectName = projectName
-                        ) { success ->
-                            if (success) {
-                                getUserProjects(
-                                    db = FirebaseFirestore.getInstance(),
-                                    uid = navData.uid
-                                ) { projects ->
-                                    projectsList.value = projects
+                        },
+                        onDelete = { projectName ->
+                            deleteProject(
+                                db = FirebaseFirestore.getInstance(),
+                                uid = navData.uid,
+                                projectName = projectName
+                            ) { success ->
+                                if (success) {
+                                    getUserProjects(
+                                        db = FirebaseFirestore.getInstance(),
+                                        uid = navData.uid
+                                    ) { projects ->
+                                        projectsList.value = projects
+                                    }
+                                } else {
+                                    errorState.value = "Error"
                                 }
-                            } else {
-                                errorState.value = "Error"
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
             if (errorState.value.isNotEmpty()) {
                 item {
@@ -124,7 +133,12 @@ private fun getUserProjects(
         }
 }
 
-private fun deleteProject(db: FirebaseFirestore, uid: String, projectName: String, onResult: (Boolean) -> Unit) {
+private fun deleteProject(
+    db: FirebaseFirestore,
+    uid: String,
+    projectName: String,
+    onResult: (Boolean) -> Unit
+) {
     db.collection("users")
         .document(uid)
         .collection("projects")

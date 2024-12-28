@@ -1,4 +1,4 @@
-package com.example.taxonomy
+package com.example.taxonomy.ui.screens
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,6 +26,7 @@ import androidx.navigation.NavHostController
 import com.chaquo.python.PyObject
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import com.example.taxonomy.R
 import com.example.taxonomy.ui.data.DocumentCorpusObject
 import com.example.taxonomy.ui.data.ProfileObject
 import com.example.taxonomy.ui.data.TaxonomyObject
@@ -69,7 +70,7 @@ fun DocumentCorpus(
                     return
                 }
 
-                if(fileName == null) {
+                if (fileName == null) {
                     errorState.value = "Could not get file name"
                     return
                 }
@@ -85,6 +86,7 @@ fun DocumentCorpus(
                     try {
                         val reader = BufferedReader(InputStreamReader(inputStream))
                         val text = reader.readText()
+                        errorState.value = ""
                         textContent.value += text
                     } catch (e: Exception) {
                         textContent.value += "Error reading file: ${e.message}\n"
@@ -164,14 +166,17 @@ fun DocumentCorpus(
         ) {
             ButtonWithIconRight(
                 onClick = {
-                    if (textContent.value.isNotEmpty()) {
+                    if (textContent.value.isEmpty()) {  // Check for empty text content
+                        errorState.value = "Please load data first" // Set error message
+                    } else {
                         if (!Python.isStarted()) {
                             Python.start(AndroidPlatform(context))
                         }
                         val python = Python.getInstance()
                         val pythonModule = python.getModule("term_extraction")
 
-                        val result: PyObject = pythonModule.callAttr("extract_entities", textContent.value)
+                        val result: PyObject =
+                            pythonModule.callAttr("extract_entities", textContent.value)
 
                         val resultTuple = result.asList()
                         val categoriesPyList = resultTuple[0].asList()

@@ -1,4 +1,4 @@
-package com.example.taxonomy
+package com.example.taxonomy.ui.screens
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
