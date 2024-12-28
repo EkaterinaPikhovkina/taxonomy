@@ -85,7 +85,7 @@ fun TopAppBar(
     contentColor: Color = MaterialTheme.colorScheme.onPrimary,
     navController: NavHostController?,
     navData: ProfileObject?
-    ) {
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -124,7 +124,7 @@ fun TopAppBar(
                     .size(20.dp)
                     .clickable {
                         if (navData != null) {
-                            navController?.navigate(ProfileObject(navData.uid, navData.email))
+                            navController?.navigate(ProfileObject(navData.uid))
                         }
                     },
                 contentScale = ContentScale.Fit
@@ -133,30 +133,30 @@ fun TopAppBar(
     }
 }
 
-@Composable
-fun ButtonWithIconLeft(onClick: () -> Unit, text: String, icon: Int, contentDescription: String? = null) {
-    Button(onClick = onClick) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(icon)
-                    .decoderFactory(SvgDecoder.Factory())
-                    .build(),
-                contentDescription = contentDescription,
-                modifier = Modifier.size(16.dp),
-                contentScale = ContentScale.Fit
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelMedium,
-            )
-        }
-    }
-}
+//@Composable
+//fun ButtonWithIconLeft(onClick: () -> Unit, text: String, icon: Int, contentDescription: String? = null) {
+//    Button(onClick = onClick) {
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically,
+//            horizontalArrangement = Arrangement.Center
+//        ) {
+//            AsyncImage(
+//                model = ImageRequest.Builder(LocalContext.current)
+//                    .data(icon)
+//                    .decoderFactory(SvgDecoder.Factory())
+//                    .build(),
+//                contentDescription = contentDescription,
+//                modifier = Modifier.size(16.dp),
+//                contentScale = ContentScale.Fit
+//            )
+//            Spacer(modifier = Modifier.width(8.dp))
+//            Text(
+//                text = text,
+//                style = MaterialTheme.typography.labelMedium,
+//            )
+//        }
+//    }
+//}
 
 @Composable
 fun ButtonWithIconRight(onClick: () -> Unit, text: String, icon: Int, contentDescription: String? = null) {
@@ -233,7 +233,8 @@ fun ProjectCard(
     title: String,
     backgroundColor: Color = MaterialTheme.colorScheme.secondary,
     contentColor: Color = MaterialTheme.colorScheme.onSecondary,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDelete: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -251,19 +252,19 @@ fun ProjectCard(
                 .copy(fontFeatureSettings = "c2sc, smcp"),
             textAlign = TextAlign.Start,
         )
-//        AsyncImage(
-//            model = ImageRequest.Builder(LocalContext.current)
-//                .data(R.drawable.trash)
-//                .decoderFactory(SvgDecoder.Factory())
-//                .build(),
-//            contentDescription = "Delete",
-//            modifier = Modifier
-//                .size(20.dp)
-//                .clickable {
-//
-//                },
-//            contentScale = ContentScale.Fit
-//        )
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(R.drawable.trash)
+                .decoderFactory(SvgDecoder.Factory())
+                .build(),
+            contentDescription = "Delete",
+            modifier = Modifier
+                .size(20.dp)
+                .clickable {
+                    onDelete(title)
+                },
+            contentScale = ContentScale.Fit
+        )
     }
 }
 

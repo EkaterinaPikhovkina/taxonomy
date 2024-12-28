@@ -63,6 +63,7 @@ fun LoginScreen(
                 label = { Text("Password") }
             )
             if (errorState.value.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = errorState.value,
                     style = MaterialTheme.typography.bodyLarge,
@@ -133,7 +134,6 @@ private fun signUp(
             if (task.isSuccessful) onSignUpSuccess(
                 ProfileObject(
                     task.result.user?.uid!!,
-                    task.result.user?.email!!,
                 )
             )
         }
@@ -160,7 +160,6 @@ private fun signIn(
             if (task.isSuccessful) onSignInSuccess(
                 ProfileObject(
                     task.result.user?.uid!!,
-                    task.result.user?.email!!,
                 )
             )
         }

@@ -64,9 +64,6 @@ class MainActivity : ComponentActivity() {
                     composable<TaxonomyObject> { navEntry ->
                         Taxonomy(
                             navController = navController,
-                            navigateBack = {
-                                navController.popBackStack()
-                            },
                             navEntry.toRoute<TaxonomyObject>(),
                         )
                     }

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +30,7 @@ fun Projects(
     navData: ProjectsObject
 ) {
     val projectsList = remember { mutableStateOf(emptyList<ProjectData>()) }
+    val errorState = remember { mutableStateOf("") }
 
     LaunchedEffect(navData.uid) {
         val db = Firebase.firestore
@@ -43,7 +46,7 @@ fun Projects(
             titleText = "My Projects",
             navController = navController,
             profileIcon = 1,
-            navData = ProfileObject(navData.uid, navData.email)
+            navData = ProfileObject(navData.uid)
         )
 
         LazyColumn(
@@ -53,14 +56,15 @@ fun Projects(
                 .padding(start = 30.dp, top = 30.dp, end = 30.dp, bottom = 0.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+
             items(projectsList.value) { project ->
+
                 ProjectCard(
                     title = project.name,
                     onClick = {
                         navController.navigate(
                             TaxonomyObject(
                                 uid = navData.uid,
-                                email = navData.email,
                                 name = project.name,
                                 categories = project.categories.joinToString(","),
                                 keywords = project.keywords.entries.joinToString("|") { (category, keywords) ->
@@ -68,8 +72,34 @@ fun Projects(
                                 }
                             )
                         )
+                    },
+                    onDelete = { projectName ->
+                        deleteProject(
+                            db = FirebaseFirestore.getInstance(),
+                            uid = navData.uid,
+                            projectName = projectName
+                        ) { success ->
+                            if (success) {
+                                getUserProjects(
+                                    db = FirebaseFirestore.getInstance(),
+                                    uid = navData.uid
+                                ) { projects ->
+                                    projectsList.value = projects
+                                }
+                            } else {
+                                errorState.value = "Error"
+                            }
+                        }
                     }
                 )
+            }
+            if (errorState.value.isNotEmpty()) {
+                item {
+                    Text(
+                        text = errorState.value,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
             }
         }
     }
@@ -93,3 +123,31 @@ private fun getUserProjects(
             onProjects(emptyList())
         }
 }
+
+private fun deleteProject(db: FirebaseFirestore, uid: String, projectName: String, onResult: (Boolean) -> Unit) {
+    db.collection("users")
+        .document(uid)
+        .collection("projects")
+        .whereEqualTo("name", projectName)
+        .get()
+        .addOnSuccessListener { querySnapshot ->
+            for (document in querySnapshot) {
+                document.reference.delete()
+                    .addOnSuccessListener {
+                        onResult(true)
+                    }
+                    .addOnFailureListener { e ->
+                        println("Error deleting project: $e")
+                        onResult(false)
+                    }
+                return@addOnSuccessListener
+            }
+            onResult(false)
+        }
+        .addOnFailureListener { e ->
+            println("Error finding project: $e")
+            onResult(false)
+        }
+}
+
+

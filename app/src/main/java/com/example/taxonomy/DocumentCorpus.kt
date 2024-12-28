@@ -6,12 +6,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -20,13 +20,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
 import com.chaquo.python.PyObject
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
@@ -41,22 +37,49 @@ fun DocumentCorpus(
     navController: NavHostController,
     navData: DocumentCorpusObject
 ) {
-    val loadedFiles = remember { mutableStateOf<List<String>>(emptyList()) }
     val textContent = remember { mutableStateOf("") }
     val context = LocalContext.current
+    val errorState = remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         TopAppBar(
             iconResId = R.drawable.doc,
             titleText = "Document Corpus",
             navController = navController,
             profileIcon = 1,
-            navData = ProfileObject(navData.uid, navData.email)
+            navData = ProfileObject(navData.uid)
         )
 
         fun processAllFiles(uris: List<Uri>) {
             uris.forEach { uri ->
                 val contentResolver = context.contentResolver
+                val fileName = try {
+                    val cursor = contentResolver.query(uri, null, null, null, null)
+                    cursor?.use {
+                        if (it.moveToFirst()) {
+                            val displayNameIndex = it.getColumnIndex("_display_name")
+                            if (displayNameIndex != -1) it.getString(displayNameIndex) else null
+                        } else null
+                    }
+                } catch (e: Exception) {
+                    errorState.value = "Error getting file name: ${e.message}"
+                    return
+                }
+
+                if(fileName == null) {
+                    errorState.value = "Could not get file name"
+                    return
+                }
+
+
+                if (!fileName.endsWith(".txt", ignoreCase = true)) {
+                    errorState.value = "Unsupported file type. Only .txt files are allowed."
+                    return
+                }
+
                 val inputStream = contentResolver.openInputStream(uri)
                 if (inputStream != null) {
                     try {
@@ -79,69 +102,59 @@ fun DocumentCorpus(
             }
         )
 
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
-                .padding(start = 30.dp, top = 32.dp, end = 30.dp, bottom = 0.dp),
-            verticalArrangement = Arrangement.spacedBy(28.dp)
+                .weight(1f)
+                .padding(start = 30.dp, top = 30.dp, end = 30.dp, bottom = 0.dp),
         ) {
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    OutlinedButton(
-                        onClick = {
-                            launcher.launch(
-                                arrayOf(
-                                    "text/plain",
-                                    "application/pdf",
-                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                )
+            Text(
+                text = "This program supports processing files with .txt extension and in English",
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        launcher.launch(
+                            arrayOf(
+                                "text/plain"
                             )
-                        },
-                    ) {
-                        Text(
-                            text = "Load Data",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSecondary
                         )
-                    }
-                }
-            }
-
-            items(loadedFiles.value) { file ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    },
                 ) {
                     Text(
-                        text = file,
+                        text = "Load Data",
                         style = MaterialTheme.typography.labelMedium,
-                    )
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(R.drawable.close)
-                            .decoderFactory(SvgDecoder.Factory())
-                            .build(),
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        contentScale = ContentScale.Fit
+                        color = MaterialTheme.colorScheme.onSecondary
                     )
                 }
             }
-
-            item {
+            if (errorState.value.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    text = textContent.value,
+                    text = errorState.value,
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
+            Spacer(modifier = Modifier.height(20.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+            ) {
+                item {
+                    Text(
+                        text = textContent.value,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            }
         }
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -158,7 +171,7 @@ fun DocumentCorpus(
                         val python = Python.getInstance()
                         val pythonModule = python.getModule("term_extraction")
 
-                        val result: PyObject = pythonModule.callAttr("fun", textContent.value)
+                        val result: PyObject = pythonModule.callAttr("extract_entities", textContent.value)
 
                         val resultTuple = result.asList()
                         val categoriesPyList = resultTuple[0].asList()
@@ -172,12 +185,13 @@ fun DocumentCorpus(
                         val categoriesString = categories.joinToString(",")
                         val keywordsString = keywords.joinToString("|") { it.joinToString(",") }
 
-                        navController.navigate(TaxonomyObject(
-                            uid = navData.uid,
-                            email = navData.email,
-                            categories = categoriesString,
-                            keywords = keywordsString
-                        ))
+                        navController.navigate(
+                            TaxonomyObject(
+                                uid = navData.uid,
+                                categories = categoriesString,
+                                keywords = keywordsString
+                            )
+                        )
                     }
                 },
                 text = "Next",
