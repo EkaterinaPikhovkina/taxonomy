@@ -44,6 +44,7 @@ fun Profile(
 ) {
     val auth = FirebaseAuth.getInstance()
     var email by remember { mutableStateOf("") }
+    var isLoggedIn by remember { mutableStateOf(true) }
     var isLoading by remember { mutableStateOf(true) }
     val errorState = remember { mutableStateOf("") }
 
@@ -51,11 +52,11 @@ fun Profile(
         val user = auth.currentUser
         if (user != null) {
             email = user.email ?: ""
-            isLoading = false
         } else {
             errorState.value = "User not logged in"
-            isLoading = false
+            isLoggedIn = false
         }
+        isLoading = false
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -104,33 +105,43 @@ fun Profile(
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
-            Text(
-                text = "New Project",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSecondary,
-                modifier = Modifier.clickable {
-                    navController.navigate(
-                        DocumentCorpusObject(navData.uid)
-                    )
-                }
-            )
-            Text(
-                text = "My Projects",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSecondary,
-                modifier = Modifier.clickable {
-                    navController.navigate(ProjectsObject(navData.uid))
-                }
-            )
-            Text(
-                text = "Log Out",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSecondary,
-                modifier = Modifier.clickable {
-                    signOut(auth)
-                    navController.navigate(LoginScreenObject)
-                }
-            )
+            if (isLoggedIn) {
+                Text(
+                    text = "New Project",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier.clickable {
+                        navController.navigate(
+                            DocumentCorpusObject(navData.uid)
+                        )
+                    }
+                )
+                Text(
+                    text = "My Projects",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier.clickable {
+                        navController.navigate(ProjectsObject(navData.uid))
+                    }
+                )
+            }
+                Text(
+                    text = "Log Out",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier.clickable {
+                        if (isLoggedIn) {
+                            signOut(auth)
+                            navController.navigate(LoginScreenObject) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        } else {
+                            navController.navigate(LoginScreenObject) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    }
+                )
         }
     }
 }
