@@ -76,7 +76,7 @@ fun Projects(
                                     name = project.name,
                                     categories = project.categories.joinToString(","),
                                     keywords = project.keywords.entries.joinToString("|") { (category, keywords) ->
-                                        "$category," + keywords.joinToString(",")
+                                        "$category;${keywords.joinToString(",")}"
                                     }
                                 )
                             )

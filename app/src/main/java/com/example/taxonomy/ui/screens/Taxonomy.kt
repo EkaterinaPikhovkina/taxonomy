@@ -58,9 +58,12 @@ fun Taxonomy(
     }
     val initialKeywordsMap = remember(navData.keywords) {
         navData.keywords.split("|")
-            .mapIndexed { index, keywordGroup ->
-                val category = categories.getOrNull(index) ?: "Category $index"
-                category to keywordGroup.split(",").filter { it.isNotBlank() }
+            .map { keywordGroup ->
+                val parts = keywordGroup.split(";", limit = 2)
+                val category = parts[0]
+                val keywords =
+                    parts.getOrNull(1)?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+                category to keywords
             }.associate { it }
     }
 
@@ -260,6 +263,14 @@ fun Taxonomy(
                 .padding(start = 30.dp, top = 30.dp, end = 30.dp, bottom = 0.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            item {
+                Text(
+                    text = "To edit a card, click on it.\n" +
+                            "To save the project, change its name.",
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
+
             item {
                 AuthTextField(
                     value = projectName.value,

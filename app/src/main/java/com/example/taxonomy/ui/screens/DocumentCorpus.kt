@@ -166,8 +166,8 @@ fun DocumentCorpus(
         ) {
             ButtonWithIconRight(
                 onClick = {
-                    if (textContent.value.isEmpty()) {  // Check for empty text content
-                        errorState.value = "Please load data first" // Set error message
+                    if (textContent.value.isEmpty()) {
+                        errorState.value = "Please load data first"
                     } else {
                         if (!Python.isStarted()) {
                             Python.start(AndroidPlatform(context))
