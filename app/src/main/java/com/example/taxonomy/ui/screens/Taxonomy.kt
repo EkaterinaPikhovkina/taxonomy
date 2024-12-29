@@ -67,7 +67,10 @@ fun Taxonomy(
             }.associate { it }
     }
 
-    var keywordsMap by remember { mutableStateOf(initialKeywordsMap) }
+    var keywordsMap by remember {
+        mutableStateOf(
+            initialKeywordsMap)
+    }
     val firestore = remember { Firebase.firestore }
     val projectName = remember { mutableStateOf(navData.name) }
     val projectsList = remember { mutableStateOf(emptyList<ProjectData>()) }

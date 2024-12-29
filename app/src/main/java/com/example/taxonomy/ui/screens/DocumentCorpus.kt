@@ -111,7 +111,8 @@ fun DocumentCorpus(
                 .padding(start = 30.dp, top = 30.dp, end = 30.dp, bottom = 0.dp),
         ) {
             Text(
-                text = "This program supports processing files with .txt extension and in English",
+                text = "This program supports processing files with .txt extension and in English.\n" +
+                        "You can upload more than one file.",
                 style = MaterialTheme.typography.bodyLarge,
             )
             Spacer(modifier = Modifier.height(20.dp))
@@ -188,7 +189,9 @@ fun DocumentCorpus(
                         }
 
                         val categoriesString = categories.joinToString(",")
-                        val keywordsString = keywords.joinToString("|") { it.joinToString(",") }
+                        val keywordsString = categories.zip(keywords).joinToString("|") { (category, keywordList) ->
+                            "$category;${keywordList.joinToString(",")}"
+                        }
 
                         navController.navigate(
                             TaxonomyObject(
